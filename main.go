@@ -6,6 +6,8 @@ import (
 
 	"github.com/rohanthewiz/rox"
 	"github.com/valyala/fasthttp"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 func main() {
@@ -57,23 +59,24 @@ func main() {
 
 		ctx.Response.Header.Add("Content-Type", "text/html")
 		_, _ = ctx.WriteString(`
-<img src="/images/tiger.jpg" style="float: right; width: 400px; height: 400px"/>
-<h2>Hello there! Rox here.</h2>
-`)
+			<img src="/images/tiger.jpg" style="float: right; width: 400px"/>
+			<h2>Hello there! Rox here.</h2>`,
+		)
 		_, _ = ctx.WriteString("<h3>Hello there! Susie here.</h3>")
 	})
 
 	r.Get("/hail/:name/mood/:whatmood", func(ctx *fasthttp.RequestCtx, params rox.Params) {
 		ctx.Response.Header.Add("Content-Type", "text/html")
 		name := params.ByName("name")
+		name = cases.Title(language.English).String(name)
 		mood := params.ByName("whatmood")
 
+		_, _ = ctx.WriteString(`<img src="/images/tiger.jpg" style="float: right; height: 280px"/>`)
 		if mood == "happy" {
 			_, _ = ctx.WriteString(fmt.Sprintf("<h2>Hello there %s! Welcome!</h2>", name))
 		} else {
 			_, _ = ctx.WriteString(fmt.Sprintf("<h2>Hey %s. Go Away!</h2>", name))
 		}
-		_, _ = ctx.WriteString(`<img src="/images/tiger.jpg" style="float: right"/>`)
 	})
 
 	r.Get("/greet/:name", func(ctx *fasthttp.RequestCtx, params rox.Params) {
